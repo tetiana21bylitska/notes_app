@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Нотатки</h2>
+        <a href="{% url 'note_create' %}" class="btn btn-success">+ Створити нотатку</a>
+    </div>
+
+    <div class="mb-4">
+        <div class="btn-group shadow-sm" role="group">
+            <a href="?view_mode=personal" class="btn btn-outline-primary {% if request.GET.view_mode != 'group' %}active{% endif %}">
+                Мої персональні
+            </a>
+            <a href="?view_mode=group" class="btn btn-outline-primary {% if request.GET.view_mode == 'group' %}active{% endif %}">
+                 Нотатки групи
+            </a>
+        </div>
+    </div>
+
+    <div class="card p-3 mb-4 shadow-sm border-0 bg-light">
+        <form method="get" class="row g-3">
+            <input type="hidden" name="view_mode" value="{{ request.GET.view_mode|default:'personal' }}">
+
+            <div class="col-md-5">
+                <input type="text" name="search" class="form-control" placeholder="Пошук за заголовком..." value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-4">
+                <select name="category" class="form-select">
+                    <option value="">Всі категорії</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"i" %}selected{% endif %}>
+                            {{ cat.title }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">Шукати</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="row">
+        {% for note in notes %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm h-100 border-0">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="card-title text-primary">{{ note.title }}</h5>
+                            {% if request.GET.view_mode == 'group' %}
+                                <span class="badge bg-info text-dark small" style="font-size: 0.7rem;"> {{ note.author.username }}</span>
+                            {% endif %}
+                        </div>
+                        <h6 class="card-subtitle mb-2 text-muted small">
+                            Категорія: {{ note.category.title }}
+                        </h6>
+                        <p class="card-text text-secondary">
+                            {{ note.text|truncatechars:80 }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <a href="{% url 'note_detail' note.pk %}" class="btn btn-sm btn-outline-info">Деталі</a>
+                            {% if note.reminder %}
+                                <span class="badge bg-light text-dark small border"> {{ note.reminder|date:"d.m" }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center mt-5">
+                <p class="text-muted">Нотаток не знайдено. Спробуйте змінити пошук або категорію.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

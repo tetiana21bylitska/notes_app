@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+<h1>{{ note.title }}</h1>
+<p><strong>Категорія:</strong> {{ note.category }}</p>
+<p><strong>Деталі:</strong> {{ note.text }}</p>
+{% if note.reminder %}
+    <p><strong>Нагадування:</strong> {{ note.reminder|date:"d.m.Y H:i" }}</p>
+{% endif %}
+
+<hr>
+<a href="{% url 'note_edit' note.pk %}">Редагувати</a> |
+<a href="{% url 'note_delete' note.pk %}">Видалити</a> |
+<a href="{% url 'note_list' %}">Назад до списку</a>
+
+
+{% block content %}
+    <div class="container">
+        <h2 class="display-5 text-primary">{{ note.title }}</h2>
+        <div class="card my-4 shadow-sm">
+            <div class="card-body">
+                <p><strong>Категорія:</strong> {{ note.category.title }}</p>
+                <p><strong>Текст:</strong><br>{{ note.text|linebreaks }}</p>
+                <p><strong>Нагадування:</strong> {{ note.reminder|date:"d.m.Y H:i" }}</p>
+            </div>
+        </div>
+        <div class="actions">
+            <a href="{% url 'note_update' note.pk %}" class="btn btn-warning">Редагувати</a>
+            <a href="{% url 'note_delete' note.pk %}" class="btn btn-danger">Видалити</a>
+            <a href="{% url 'note_list' %}" class="btn btn-secondary">Назад до списку</a>
+        </div>
+    </div>
+{% endblock %}

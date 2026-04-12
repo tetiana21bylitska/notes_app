@@ -1,0 +1,51 @@
+{#{% load static %}#}
+{#<!DOCTYPE html>#}
+{#<html>#}
+{#<head>#}
+{#    <title>Список продуктів</title>#}
+{#    <link rel="stylesheet" href="{% static 'css/styles.css' %}">#}
+{#</head>#}
+{#<body>#}
+{#<h1>Наші продукти</h1>#}
+{#{% for product in products %}#}
+{#    <div class="product-card">#}
+{#        <h2 class="product-name">{{ product.name }}</h2>#}
+{#        <p class="product-price">Ціна: ${{ product.price }}</p>#}
+{#        <p class="product-description">{{ product.description }}</p>#}
+{#    </div>#}
+{#{% endfor %}#}
+{#</body>#}
+{#</html>#}
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <title>Список моїх нотаток</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+<h1>Мої нотатки та завдання</h1>
+
+<div class="notes-container">
+    {% for note in notes %}
+        <div class="note-card">
+            <h2 class="note-title">{{ note.title }}</h2>
+
+            <p class="note-category">
+                <strong>Категорія:</strong> {{ note.category.title }}
+            </p>
+
+            <p class="note-text">{{ note.text }}</p>
+
+            {% if note.reminder %}
+                <p class="note-reminder"> Нагадати: {{ note.reminder }}</p>
+            {% endif %}
+        </div>
+        <hr> {% endfor %}
+</div>
+
+</body>
+</html>
