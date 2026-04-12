@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Імпорт нотаток — {{ view_type|title }}</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f8f9fa; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #333; border-bottom: 2px solid #007cba; padding-bottom: 10px; }
+        .btn { padding: 12px 24px; background: #007cba; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background 0.3s; }
+        .btn:hover { background: #005a85; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .results { margin-top: 25px; padding: 20px; background: #e9ecef; border-left: 5px solid #007cba; border-radius: 5px; }
+        .info-row { margin: 10px 0; font-size: 18px; }
+        .highlight { font-weight: bold; color: #007cba; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Імпорт нотаток ({{ view_type|upper }})</h1>
+        <p>Ця сторінка демонструє швидкість завантаження даних із зовнішнього API у вашу базу даних.</p>
+
+        <form id="importForm" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn" id="submitBtn">Запустити {{ view_type }} імпорт</button>
+        </form>
+
+        <div id="results" class="results" style="display: none;">
+            <h3>Результати виконання:</h3>
+            <div id="resultsContent">
+                <div class="info-row">Тип запиту: <span id="resType" class="highlight"></span></div>
+                <div class="info-row">Час виконання: <span id="resTime" class="highlight"></span> секунд</div>
+                <div class="info-row">Створено нотаток: <span id="resCount" class="highlight"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('importForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('submitBtn');
+            const resultsDiv = document.getElementById('results');
+
+            btn.disabled = true;
+            btn.textContent = 'Зачекайте, йде імпорт...';
+            resultsDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+
+                const data = await response.json();
+
+                resultsDiv.style.display = 'block';
+                document.getElementById('resType').textContent = data.type;
+                document.getElementById('resTime').textContent = data.execution_time;
+                document.getElementById('resCount').textContent = data.count;
+
+            } catch (error) {
+                alert('Сталася помилка: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Запустити {{ view_type }} імпорт';
+            }
+        });
+    </script>
+</body>
+</html>

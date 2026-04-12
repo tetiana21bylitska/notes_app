@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Порівняння HTTP клієнтів</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 40px; background-color: #f0f2f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        h1 { color: #1a1a1a; text-align: center; }
+        .form-group { background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px; }
+        select { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; margin-bottom: 15px; }
+        .btn { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 18px; }
+        .btn:hover { background: #218838; }
+        .results { margin-top: 30px; padding: 20px; border-radius: 8px; background: #f8f9fa; border: 1px solid #dee2e6; }
+        .stats { display: flex; justify-content: space-around; text-align: center; }
+        .stat-box { padding: 10px; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #28a745; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Порівняння швидкості HTTP</h1>
+
+        <form id="comparisonForm" method="post" class="form-group">
+            {% csrf_token %}
+            <label for="clientType">Оберіть метод тестування:</label>
+            <select name="client_type" id="clientType">
+                <option value="httpx_sync">HTTPX (Послідовно / Синхронно)</option>
+                <option value="httpx_async">HTTPX (Паралельно / Асинхронно)</option>
+            </select>
+            <button type="submit" class="btn" id="testBtn">Почати тест</button>
+        </form>
+
+        <div id="results" class="results" style="display: none;">
+            <h3 style="text-align: center;">Результати заміру:</h3>
+            <div class="stats">
+                <div class="stat-box">
+                    <div>Метод:</div>
+                    <div id="resClient" class="stat-value" style="font-size: 18px;"></div>
+                </div>
+                <div class="stat-box">
+                    <div>Час виконання:</div>
+                    <div id="resTime" class="stat-value"></div>
+                </div>
+                <div class="stat-box">
+                    <div>Запитів:</div>
+                    <div id="resCount" class="stat-value"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('comparisonForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('testBtn');
+            const resultsDiv = document.getElementById('results');
+
+            btn.disabled = true;
+            btn.textContent = 'Вимірюємо швидкість...';
+
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+
+                const data = await response.json();
+
+                resultsDiv.style.display = 'block';
+                document.getElementById('resClient').textContent = data.client_type;
+                document.getElementById('resTime').textContent = data.execution_time + ' сек';
+                document.getElementById('resCount').textContent = data.results_count;
+
+            } catch (error) {
+                alert('Помилка при тестуванні: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Почати тест';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import *
 
 urlpatterns = [
     path('', views.NoteListView.as_view(), name='note_list'),
@@ -11,4 +12,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
+    path('import/sync/', SyncNoteImportView.as_view(), name='sync_import'),
+    path('import/async/', AsyncNoteImportView.as_view(), name='async_import'),
+    path('import/comparison/', HttpClientComparisonView.as_view(), name='http_comparison'),
 ]
