@@ -127,5 +127,5 @@ LOGOUT_REDIRECT_URL = 'login'
 
 LOGIN_URL = 'login'
 
-TELEGRAM_BOT_TOKEN = ''
+TELEGRAM_BOT_TOKEN = '123:abc'
 TELEGRAM_CHANNEL_ID = '@myNotesApp21channel'
